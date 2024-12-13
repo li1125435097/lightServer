@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>接口模拟</title>
+  <style>
+    input,select,option,textarea{
+      padding: 4px 7px;
+      margin: 3px 0;
+    }
+    body{
+      margin: 20px 20px;
+    }
+    textarea{
+      width: calc(100% - 150px);
+      height: 80px;
+    }
+    .add{
+      padding: 5px 150px;
+      margin: auto;
+      display: block;
+    }
+    .content{
+      width: calc(100% - 40px);
+      padding: 20px;
+    }
+    .show{
+      overflow-y: auto;
+      height: calc(100vh - 450px);
+    }
+    .header>.item{margin-bottom: 0px;}
+    label{vertical-align: top;}
+    .c1{width: 200px;display: inline-block;}
+    .c2{width: 100px;display: inline-block;}
+    .c3{width: 150px;display: inline-block;}
+    .c4{width: 300px;display: inline-block;}
+    .c5{min-width: 100px;display: inline-block;}
+    .c1,.c2,.c3,.c4,.c5{vertical-align: middle;}
+    .box{display: flex;}
+    .left,.right{flex:1;}
+    .item{margin: 5px;border-radius: 4px;padding: 10px;box-shadow: 2px 2px 7px #ccc;}
+    ::-webkit-scrollbar{width: 5px;}
+    ::-webkit-scrollbar-thumb{border-radius: 4px;background-color: #ddd;}
+  </style>
+</head>
+<body>
+  <h2>接口模拟</h1>
+  <form id="mockForm" method="post" action="/addMock" enctype="application/json">
+    <label for="path">请求路径:</label>
+    <input type="text" id="path" name="path" placeholder="例如：/api/getUser" required>
+    <br>
+    <label for="method">请求方式:</label>
+    <select id="method" name="method" required>
+      <option value="GET">GET</option>
+      <option value="POST">POST</option>
+      <option value="PUT">PUT</option>
+      <option value="DELETE">DELETE</option>
+      <option value="PATCH">PATCH</option>
+    </select>
+    <br>
+    <label for="param">请求参数:</label>
+    <input type="text" id="param" name="param" placeholder="例如：targetId,userId">
+    <div class="box">
+      <div class="left">
+        <label for="hook">钩子函数:</label>
+        <textarea id="hook" name="hook" placeholder="响应数据钩子函数能获取到请求参数和响应数据和响应头三个参数，例如：function(body,resData,header){resData.code=1;header.statusCode=401;return resData}"></textarea>
+      </div>
+      <div class="right">
+        <label for="response">响应数据:</label>
+        <textarea id="response" name="response" placeholder='后边花括号的值可以根据请求参数渲染，例如：{ "code": 200, "data":{ "targetId": {{targetId}} }, "msg": "成功" }' required></textarea>
+      </div>
+    </div>
+    
+    <div><button class="add" type="submit">添加</button></div>
+  </form>
+  
+  <div class="content">
+    <div class="header">
+      <div class="search">
+        <label for="search">请求参数:</label>
+        <input type="text" id="search" placeholder="请输入任意关键字" onkeydown="keydown()">
+        <button onclick="search()">搜索</button>
+      </div>
+      <div class="item">
+        <div class="c1">请求路径</div>
+        <div class="c2">请求方式</div>
+        <div class="c3">请求参数</div>
+        <div class="c4">钩子函数</div>
+        <div class="c5">响应数据</div>
+      </div>
+    </div>
+    <div class="show"></div>
+  </div>
+  <script>
+    let listData 
+    // 重置添加函数
+    document.getElementById('mockForm').onsubmit = async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const payload = {}
+      formData.forEach((v,k) => payload[k] =v)
+      if(!payload.path.startsWith('/')) return alert('请求路径必须以/开头')
+      if(payload.method === 'POST' && payload.response && !payload.hook.match('Content-Type')) try {JSON.parse(payload.response)} catch (error) {return alert('响应数据json格式验证失败')}
+      if(payload.hook){
+        if(payload.hook.slice(0,30) != 'function(body,resData,header){') return alert('必须以function(body,resData,header){开头')
+        if(payload.hook.slice(-1) != '}')  return alert('必须以}结尾')
+      }
+      const response = await fetch('/addMock', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+      const text = await response.text();
+      alert(text);
+      init()
+    }
+
+    // 初始化页面
+    async function init(){
+      const response = await fetch('/getMock', {method: 'GET'})
+      const data = await response.json()
+      render(data)
+      listData = data
+    }
+    init()
+
+    // 渲染已添加接口
+    function render(data){
+      // data.unshift({path:'请求路径',method:'请求方式',param:'请求参数',hook:'钩子函数',response:'响应数据'})
+      const htmls = []
+      data.forEach(v => htmls.push(`
+        <div class="item">
+          <div class="c1">${v.path}</div>
+          <div class="c2">${v.method}</div>
+          <div class="c3">${v.param}</div>
+          <div class="c4">${v.hook}</div>
+          <div class="c5">${v.response}</div>
+        </div>
+      `))
+      document.querySelector('.show').innerHTML = htmls.join('')
+    }
+
+    // 搜索
+    function search(){
+      const searchTxt = document.querySelector('#search').value
+      render(listData.filter(v => JSON.stringify(v).match(searchTxt)))
+    }
+
+    // 回车搜索
+    function keydown(){
+      if(event.key === 'Enter' || event.keyCode === 13) search()
+    }
+
+  </script>
+</body>
+</html>
