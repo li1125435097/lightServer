@@ -3,6 +3,7 @@ FROM node:lts-alpine
 WORKDIR /app
 COPY . /app
 
+RUN npm set registry https://registry.npm.taobao.org
 RUN npm install
 RUN npm run build
 
