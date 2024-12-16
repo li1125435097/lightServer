@@ -1,0 +1,41 @@
+{
+  "name": "lightserver",
+  "version": "1.0.0",
+  "description": "http server,light server,mock server",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx uglifyjs app.js --compress --mangle -o app.min.js",
+    "docker_build": "docker build -t light-server .",
+    "docker_export": "docker save -o light-server.tar light-server:latest",
+    "docker_import": "docker load -i light-server.tar",
+    "start": "node app.min.js",
+    "dev": "npx nodemon app.js"
+  },
+  "dependencies": {
+    "express": "^4.17.3"
+  },
+  "engines": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/li1125435097/lightServer.git"
+  },
+  "keywords": [
+    "http",
+    "server",
+    "light",
+    "server",
+    "mock",
+    "server"
+  ],
+  "author": "Mount Tai",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/li1125435097/lightServer/issues"
+  },
+  "homepage": "https://github.com/li1125435097/lightServer#readme",
+  "devDependencies": {
+    "uglify-js": "^3.19.3"
+  }
+}
