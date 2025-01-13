@@ -29,14 +29,18 @@
       overflow-y: auto;
       height: calc(100vh - 450px);
     }
+    .center{
+      vertical-align: middle;
+    }
     .header>.item{margin-bottom: 0px;}
     label{vertical-align: top;}
     .c1{width: 200px;display: inline-block;}
     .c2{width: 100px;display: inline-block;}
     .c3{width: 150px;display: inline-block;}
     .c4{width: 300px;display: inline-block;}
-    .c5{min-width: 100px;display: inline-block;}
-    .c1,.c2,.c3,.c4,.c5{vertical-align: middle;}
+    .c5{width: 500px;display: inline-block;}
+    .c6{width: 100px;display: inline-block;}
+    .c1,.c2,.c3,.c4,.c5,.c6{vertical-align: middle;overflow: hidden;}
     .box{display: flex;}
     .left,.right{flex:1;}
     .item{margin: 5px;border-radius: 4px;padding: 10px;box-shadow: 2px 2px 7px #ccc;}
@@ -78,7 +82,7 @@
   <div class="content">
     <div class="header">
       <div class="search">
-        <label for="search">请求参数:</label>
+        <label class="center" for="search">关键字:</label>
         <input type="text" id="search" placeholder="请输入任意关键字" onkeydown="keydown()">
         <button onclick="search()">搜索</button>
       </div>
@@ -88,6 +92,7 @@
         <div class="c3">请求参数</div>
         <div class="c4">钩子函数</div>
         <div class="c5">响应数据</div>
+        <div class="c6">操作</div>
       </div>
     </div>
     <div class="show"></div>
@@ -135,6 +140,7 @@
           <div class="c3">${v.param}</div>
           <div class="c4">${v.hook}</div>
           <div class="c5">${v.response}</div>
+          <div class="c6"><button onclick="deleteHandle('${v.path}')">删除</button></div>
         </div>
       `))
       document.querySelector('.show').innerHTML = htmls.join('')
@@ -149,6 +155,19 @@
     // 回车搜索
     function keydown(){
       if(event.key === 'Enter' || event.keyCode === 13) search()
+    }
+
+    // 删除
+    async function deleteHandle(path){
+      const is = confirm('确认删除吗？')
+      if(!is) return
+
+      const response = await fetch(`/delMock?path=${encodeURI(path)}`, {method: 'GET'})
+      const data = await response.text()
+      if(data === '删除成功'){
+        alert(data)
+        init()
+      }
     }
 
   </script>

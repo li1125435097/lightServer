@@ -52,6 +52,17 @@ const server = http.createServer((req, res) => {
   }
 
   // 处理mock数据的请求
+  if (pathname === '/delMock') {
+    res.writeHead(200, {'Content-Type': 'application/json'});
+    const body = querystring.parse(parsedUrl.query)
+    const path = decodeURI(body.path) 
+    delete mockData[path]
+    fs.writeFileSync(dbPath,JSON.stringify(Object.values(mockData)))
+    res.end('删除成功')
+    return;
+  }
+
+  // 处理mock数据的请求
   const mockItem = mockData[pathname]
   // l(mockData,mockItem)
   if (mockItem && req.method === mockItem.method) {
