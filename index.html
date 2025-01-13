@@ -135,11 +135,11 @@
       const htmls = []
       data.forEach(v => htmls.push(`
         <div class="item">
-          <div class="c1">${v.path}</div>
-          <div class="c2">${v.method}</div>
-          <div class="c3">${v.param}</div>
-          <div class="c4">${v.hook}</div>
-          <div class="c5">${v.response}</div>
+          <div class="c1" title='${v.path}'>${v.path}</div>
+          <div class="c2" title='${v.method}'>${v.method}</div>
+          <div class="c3" title='${v.param}'>${v.param}</div>
+          <div class="c4" title='${v.hook}'>${v.hook}</div>
+          <div class="c5" title='${v.response}'>${v.response}</div>
           <div class="c6"><button onclick="deleteHandle('${v.path}')">删除</button></div>
         </div>
       `))
