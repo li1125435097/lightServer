@@ -10,7 +10,7 @@
     "docker_export": "docker save -o light-server.tar light-server:latest",
     "docker_import": "docker load -i light-server.tar",
     "start": "node app.min.js",
-    "dev": "npx nodemon app.js"
+    "dev": "node app.js"
   },
   "dependencies": {
     "express": "^4.17.3"
