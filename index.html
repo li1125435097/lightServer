@@ -76,7 +76,7 @@
       </div>
     </div>
     
-    <div><button class="add" type="submit">添加</button></div>
+    <div><button class="add" type="submit">提交</button></div>
   </form>
   
   <div class="content">
@@ -98,7 +98,9 @@
     <div class="show"></div>
   </div>
   <script>
+    // 列表数据
     let listData 
+    let isEdit = false
     // 重置添加函数
     document.getElementById('mockForm').onsubmit = async (e) => {
       e.preventDefault();
@@ -106,7 +108,7 @@
       const payload = {}
       formData.forEach((v,k) => payload[k] =v)
       if(!payload.path.startsWith('/')) return alert('请求路径必须以/开头')
-      if(payload.method === 'POST' && payload.response && !payload.hook.match('Content-Type')) try {JSON.parse(payload.response)} catch (error) {return alert('响应数据json格式验证失败')}
+      if(payload.response && !payload.hook.match('Content-Type')) try {JSON.parse(payload.response)} catch (error) {return alert('响应数据json格式验证失败')}
       if(payload.hook){
         if(payload.hook.slice(0,30) != 'function(body,resData,header){') return alert('必须以function(body,resData,header){开头')
         if(payload.hook.slice(-1) != '}')  return alert('必须以}结尾')
@@ -140,7 +142,10 @@
           <div class="c3" title='${v.param}'>${v.param}</div>
           <div class="c4" title='${v.hook}'>${v.hook}</div>
           <div class="c5" title='${v.response}'>${v.response}</div>
-          <div class="c6"><button onclick="deleteHandle('${v.path}')">删除</button></div>
+          <div class="c6">
+            <button onclick="editHandle('${v.path}')">编辑</button>
+            <button onclick="deleteHandle('${v.path}')">删除</button>
+          </div>
         </div>
       `))
       document.querySelector('.show').innerHTML = htmls.join('')
@@ -155,6 +160,19 @@
     // 回车搜索
     function keydown(){
       if(event.key === 'Enter' || event.keyCode === 13) search()
+    }
+
+    // 编辑
+    async function editHandle(path){
+      const is = confirm('确认编辑吗？')
+      if(!is) return
+      
+      const item = listData.find(v => v.path === path)
+      document.querySelector('#path').value = item.path
+      document.querySelector('#method').value = item.method
+      document.querySelector('#param').value = item.param
+      document.querySelector('#hook').value = item.hook
+      document.querySelector('#response').value = item.response
     }
 
     // 删除

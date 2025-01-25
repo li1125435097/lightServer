@@ -48,7 +48,7 @@ const server = http.createServer((req, res) => {
       // 更细缓存
       mockData[body.path] = body
       res.writeHead(200, {'Content-Type': 'text/plain'});
-      res.end('添加成功');
+      res.end('提交成功');
     });
     return;
   }
